@@ -38,5 +38,6 @@
   "devDependencies": {
     "eslint": "^7.22.0",
     "eslint-plugin-react": "^7.22.0"
-  }
+  },
+  "homepage": "."
 }
