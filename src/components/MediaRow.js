@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
+import {uploadsUrl} from '../utils/variables';
 
 const MediaRow = ({file}) => {
   return (
     <tr>
       <td>
-        <img src={file.thumbnails.w160} alt={file.title} />
+        <img src={uploadsUrl + file.thumbnails.w160} alt={file.title} />
       </td>
       <td>
         <h3>{file.title}</h3>
         <p>{file.description}</p>
       </td>
       <td>
-        <a href={file.filename}>View</a>
+        <a href={uploadsUrl + file.filename}>View</a>
       </td>
     </tr>
   );
