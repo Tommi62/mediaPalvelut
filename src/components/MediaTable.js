@@ -1,20 +1,29 @@
-import MediaRow from "./MediaRow";
-import PropTypes from "prop-types";
+import {useState, useEffect} from 'react';
+import MediaRow from './MediaRow';
 
-const MediaTable = ({picArray}) => {
+const MediaTable = () => {
+  const [picArray, setPicArray] = useState([]);
+
+  useEffect(() => {
+    const loadMedia = async () => {
+      const response = await fetch('test.json');
+      const files = await response.json();
+      console.log(files);
+      setPicArray(files);
+    };
+
+    loadMedia();
+  }, []);
+
   return (
     <table>
       <tbody>
-        {
-          picArray.map((item, index) => (<MediaRow key={index} file={item} />))
-        }
+        {picArray.map((item, index) => (
+          <MediaRow key={index} file={item} />
+        ))}
       </tbody>
     </table>
   );
-};
-
-MediaTable.propTypes = {
-  picArray: PropTypes.array.isRequired,
 };
 
 export default MediaTable;
