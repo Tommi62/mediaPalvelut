@@ -1,13 +1,47 @@
 import {uploadsUrl} from '../utils/variables';
 import PropTypes from 'prop-types';
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
+
+const useStyles = makeStyles({
+  root: {
+    maxWidth: '30%',
+    margin: 'auto',
+  },
+  media: {
+    height: '50vh',
+  },
+});
 
 const Single = ({location}) => {
+  const classes = useStyles();
+
   const file = location.state;
 
   return (
     <>
-      <h1>{file.title}</h1>
-      <img src={uploadsUrl + file.filename} alt={file.title} />
+      <Typography component="h1" variant="h2" gutterBottom align="center">
+        {file.title}
+      </Typography>
+      <Card className={classes.root}>
+        <CardActionArea>
+          <CardMedia
+            className={classes.media}
+            image={uploadsUrl + file.filename}
+            title={file.title}
+          />
+          <CardContent>
+            <Typography gutterBottom>{file.description}</Typography>
+            <Typography variant="subtitle2">{file.user_id}</Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
     </>
   );
 };

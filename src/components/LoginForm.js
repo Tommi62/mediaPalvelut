@@ -6,8 +6,19 @@ import PropTypes from 'prop-types';
 import {withRouter} from 'react-router-dom';
 import {useContext} from 'react';
 import {MediaContext} from '../contexts/MediaContext';
+import {Button, makeStyles, TextField} from '@material-ui/core';
+
+const useStyles = makeStyles({
+  root: {
+    margin: 20,
+  },
+  fields: {
+    marginRight: 20,
+  },
+});
 
 const LoginForm = ({history}) => {
+  const classes = useStyles();
   const [user, setUser] = useContext(MediaContext);
   const {postLogin} = useLogin();
 
@@ -28,19 +39,25 @@ const LoginForm = ({history}) => {
   console.log('LoginForm', inputs, user);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
+    <form className={classes.root} onSubmit={handleSubmit}>
+      <TextField
+        className={classes.fields}
+        label="username"
         name="username"
         onChange={handleInputChange}
         value={inputs.username}
       />
-      <input
+      <TextField
+        className={classes.fields}
+        label="password"
         name="password"
         type="password"
         onChange={handleInputChange}
         value={inputs.password}
       />
-      <button>Tallenna</button>
+      <Button variant="contained" color="primary" type="submit">
+        Tallenna
+      </Button>
     </form>
   );
 };
