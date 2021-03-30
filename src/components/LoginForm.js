@@ -1,16 +1,22 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable require-jsdoc */
-import PropTypes from 'prop-types';
-import {useLogin} from '../hooks/ApiHooks';
 import useLoginForm from '../hooks/LoginHooks';
+import {useLogin} from '../hooks/ApiHooks';
+import PropTypes from 'prop-types';
 import {withRouter} from 'react-router-dom';
+import {useContext} from 'react';
+import {MediaContext} from '../contexts/MediaContext';
 
 const LoginForm = ({history}) => {
+  const [user, setUser] = useContext(MediaContext);
   const {postLogin} = useLogin();
+
   const doLogin = async () => {
     try {
-      const userData = await postLogin(inputs);
-      console.log('userdata', userData);
-      localStorage.setItem('token', userData.token);
+      const userdata = await postLogin(inputs);
+      console.log('userdata', userdata);
+      localStorage.setItem('token', userdata.token);
+      setUser(userdata.user);
       history.push('/home');
     } catch (e) {
       console.log('doLogin', e.message);
@@ -19,7 +25,7 @@ const LoginForm = ({history}) => {
 
   const {inputs, handleInputChange, handleSubmit} = useLoginForm(doLogin);
 
-  console.log('LoginForm', inputs);
+  console.log('LoginForm', inputs, user);
 
   return (
     <form onSubmit={handleSubmit}>

@@ -1,6 +1,6 @@
-/* eslint-disable max-len */
 /* eslint-disable comma-dangle */
 /* eslint-disable indent */
+/* eslint-disable max-len */
 import {useState, useEffect} from 'react';
 import {baseUrl} from '../utils/variables';
 
@@ -27,6 +27,7 @@ const useAllMedia = () => {
     const loadMedia = async () => {
       const response = await fetch(baseUrl + 'media');
       const files = await response.json();
+      // console.log(files);
 
       const media = await Promise.all(
         files.map(async (item) => {
@@ -34,6 +35,7 @@ const useAllMedia = () => {
           return resp.json();
         })
       );
+
       setPicArray(media);
     };
 
@@ -68,7 +70,22 @@ const useUsers = () => {
     }
   };
 
-  return {register, getUserAvailable};
+  const getUser = async (token) => {
+    const fetchOptions = {
+      method: 'GET',
+      headers: {
+        'x-access-token': token,
+      },
+    };
+    try {
+      const response = await doFetch(baseUrl + 'users/user', fetchOptions);
+      return response;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  };
+
+  return {register, getUserAvailable, getUser};
 };
 
 const useLogin = () => {
@@ -87,6 +104,7 @@ const useLogin = () => {
       alert(e.message);
     }
   };
+
   return {postLogin};
 };
 
