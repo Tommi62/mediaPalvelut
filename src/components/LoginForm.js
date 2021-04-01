@@ -1,26 +1,27 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable require-jsdoc */
+import {useContext} from 'react';
 import useLoginForm from '../hooks/LoginHooks';
 import {useLogin} from '../hooks/ApiHooks';
 import PropTypes from 'prop-types';
 import {withRouter} from 'react-router-dom';
-import {useContext} from 'react';
 import {MediaContext} from '../contexts/MediaContext';
-import {Button, makeStyles, TextField} from '@material-ui/core';
+import {
+  Button,
+  Grid,
+  makeStyles,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 
 const useStyles = makeStyles({
   root: {
-    margin: 20,
-  },
-  fields: {
-    marginRight: 20,
+    marginTop: '2rem',
   },
 });
 
 const LoginForm = ({history}) => {
-  const classes = useStyles();
   const [user, setUser] = useContext(MediaContext);
   const {postLogin} = useLogin();
+  const classes = useStyles();
 
   const doLogin = async () => {
     try {
@@ -39,26 +40,55 @@ const LoginForm = ({history}) => {
   console.log('LoginForm', inputs, user);
 
   return (
-    <form className={classes.root} onSubmit={handleSubmit}>
-      <TextField
-        className={classes.fields}
-        label="username"
-        name="username"
-        onChange={handleInputChange}
-        value={inputs.username}
-      />
-      <TextField
-        className={classes.fields}
-        label="password"
-        name="password"
-        type="password"
-        onChange={handleInputChange}
-        value={inputs.password}
-      />
-      <Button variant="contained" color="primary" type="submit">
-        Tallenna
-      </Button>
-    </form>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      alignContent="center"
+    >
+      <Grid item xs={6}>
+        <Typography component="h1" variant="h2" gutterBottom>
+          Login
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <form onSubmit={handleSubmit}>
+          <Grid container>
+            <Grid container item>
+              <TextField
+                fullWidth
+                type="text"
+                name="username"
+                label="Username"
+                onChange={handleInputChange}
+                value={inputs.username}
+              />
+            </Grid>
+            <Grid container item>
+              <TextField
+                fullWidth
+                type="password"
+                name="password"
+                label="Password"
+                onChange={handleInputChange}
+                value={inputs.password}
+              />
+            </Grid>
+
+            <Grid container item className={classes.root}>
+              <Button
+                fullWidth
+                color="primary"
+                type="submit"
+                variant="contained"
+              >
+                Login
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Grid>
+    </Grid>
   );
 };
 
