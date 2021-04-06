@@ -22,6 +22,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import HomeIcon from '@material-ui/icons/Home';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import {CloudUpload} from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,7 +75,7 @@ const Nav = ({history}) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            <Link component={RouterLink} to="/home" color="inherit">
+            <Link component={RouterLink} to="/" color="inherit">
               MyApp
             </Link>
           </Typography>
@@ -92,7 +93,7 @@ const Nav = ({history}) => {
               color="inherit"
               startIcon={<ExitToAppIcon />}
               component={RouterLink}
-              to="/"
+              to="/login"
             >
               Login
             </Button>
@@ -105,7 +106,7 @@ const Nav = ({history}) => {
             button
             component={RouterLink}
             onClick={toggleDrawer(false)}
-            to="/home"
+            to="/"
           >
             <ListItemIcon>
               <HomeIcon />
@@ -124,6 +125,17 @@ const Nav = ({history}) => {
                   <AccountBoxIcon />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
+              </ListItem>
+              <ListItem
+                button
+                component={RouterLink}
+                onClick={toggleDrawer(false)}
+                to="/upload"
+              >
+                <ListItemIcon>
+                  <CloudUpload />
+                </ListItemIcon>
+                <ListItemText primary="Upload" />
               </ListItem>
             </>
           )}

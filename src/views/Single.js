@@ -17,6 +17,9 @@ const useStyles = makeStyles({
   media: {
     height: '50vh',
   },
+  container: {
+    marginTop: '7rem',
+  },
 });
 
 const Single = ({location}) => {
@@ -26,7 +29,13 @@ const Single = ({location}) => {
 
   return (
     <>
-      <Typography component="h1" variant="h2" gutterBottom align="center">
+      <Typography
+        component="h1"
+        variant="h2"
+        gutterBottom
+        align="center"
+        className={classes.container}
+      >
         {file.title}
       </Typography>
       <Card className={classes.root}>
