@@ -14,6 +14,9 @@ const useStyles = makeStyles({
   root: {
     marginTop: '2rem',
   },
+  container: {
+    marginTop: '7rem',
+  },
 });
 
 const RegisterForm = ({setToggle}) => {
@@ -95,6 +98,7 @@ const RegisterForm = ({setToggle}) => {
       direction="column"
       alignItems="center"
       alignContent="center"
+      className={classes.container}
     >
       <Grid item xs={3}>
         <Typography component="h1" variant="h2" gutterBottom>

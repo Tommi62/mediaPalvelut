@@ -16,6 +16,9 @@ const useStyles = makeStyles({
   root: {
     marginTop: '2rem',
   },
+  container: {
+    marginTop: '7rem',
+  },
 });
 
 const LoginForm = ({history}) => {
@@ -45,6 +48,7 @@ const LoginForm = ({history}) => {
       direction="column"
       alignItems="center"
       alignContent="center"
+      className={classes.container}
     >
       <Grid item xs={6}>
         <Typography component="h1" variant="h2" gutterBottom>
