@@ -14,7 +14,7 @@ const MediaRow = ({file}) => {
   const classes = useStyles();
   return (
     <>
-      <img src={uploadsUrl + file.thumbnails.w320} alt={file.title} />
+      <img src={uploadsUrl + file.thumbnails?.w320} alt={file.title} />
       <GridListTileBar
         title={file.title}
         subtitle={file.description}
