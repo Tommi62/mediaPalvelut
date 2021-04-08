@@ -2,7 +2,7 @@
 /* eslint-disable indent */
 /* eslint-disable max-len */
 import {useState, useEffect} from 'react';
-import {baseUrl} from '../utils/variables';
+import {appIdentifier, baseUrl} from '../utils/variables';
 
 // general function for fetching (options default value is empty object)
 const doFetch = async (url, options = {}) => {
@@ -25,7 +25,7 @@ const useAllMedia = () => {
 
   useEffect(() => {
     const loadMedia = async () => {
-      const response = await fetch(baseUrl + 'media');
+      const response = await fetch(baseUrl + 'tags/' + appIdentifier);
       const files = await response.json();
       // console.log(files);
 
@@ -86,7 +86,22 @@ const useUsers = () => {
     }
   };
 
-  return {register, getUserAvailable, getUser};
+  const getUserById = async (token, id) => {
+    const fetchOptions = {
+      method: 'GET',
+      headers: {
+        'x-access-token': token,
+      },
+    };
+    try {
+      const response = await doFetch(baseUrl + 'users/' + id, fetchOptions);
+      return response;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  };
+
+  return {register, getUserAvailable, getUser, getUserById};
 };
 
 const useLogin = () => {
@@ -132,4 +147,29 @@ const useMedia = () => {
   return {postMedia, loading};
 };
 
-export {useAllMedia, useUsers, useLogin, useMedia};
+const useTag = () => {
+  const postTag = async (token, id, tag = appIdentifier) => {
+    const data = {
+      file_id: id,
+      tag,
+    };
+    const fetchOptions = {
+      method: 'POST',
+      headers: {
+        'x-access-token': token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    };
+    try {
+      const response = await doFetch(baseUrl + 'tags', fetchOptions);
+      return response;
+    } catch (e) {
+      throw new Error('Tagging failed');
+    }
+  };
+
+  return {postTag};
+};
+
+export {useAllMedia, useUsers, useLogin, useMedia, useTag};

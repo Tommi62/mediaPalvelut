@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
 
 const MediaRow = ({file}) => {
   const classes = useStyles();
+  const desc = JSON.parse(file.description);
+  console.log('desc', desc.description);
+
   return (
     <Grid item className={classes.root} lg="4">
       <Paper elevation="4" className={classes.paper}>
@@ -48,7 +51,7 @@ const MediaRow = ({file}) => {
                   {file.title}
                 </Typography>
                 <Typography variant="body2" gutterBottom>
-                  {file.description}
+                  {desc.description}
                 </Typography>
               </Grid>
             </Grid>
