@@ -41,6 +41,14 @@ const MediaRow = ({file}) => {
                 className={classes.img}
                 src={uploadsUrl + file.thumbnails?.w160}
                 alt={file.title}
+                style={{
+                  filter: `
+                  brightness(${desc.filters.brightness}%)
+                  contrast(${desc.filters.contrast}%)
+                  saturate(${desc.filters.saturate}%)
+                  sepia(${desc.filters.sepia}%)
+                  `,
+                }}
               />
             </Link>
           </Grid>
