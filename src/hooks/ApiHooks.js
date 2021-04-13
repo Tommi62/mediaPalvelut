@@ -1,8 +1,9 @@
 /* eslint-disable comma-dangle */
 /* eslint-disable indent */
 /* eslint-disable max-len */
-import {useState, useEffect} from 'react';
+import {useEffect, useState, useContext} from 'react';
 import {appIdentifier, baseUrl} from '../utils/variables';
+import {MediaContext} from '../contexts/MediaContext';
 
 // general function for fetching (options default value is empty object)
 const doFetch = async (url, options = {}) => {
@@ -20,28 +21,103 @@ const doFetch = async (url, options = {}) => {
   }
 };
 
-const useAllMedia = () => {
+// set update to true, if you want to use getMedia automagically
+const useMedia = (update = false, ownFiles) => {
   const [picArray, setPicArray] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [user] = useContext(MediaContext);
 
-  useEffect(() => {
-    const loadMedia = async () => {
-      const response = await fetch(baseUrl + 'tags/' + appIdentifier);
-      const files = await response.json();
+  if (update) {
+    useEffect(() => {
+      try {
+        (async () => {
+          const media = await getMedia();
+          setPicArray(media);
+        })();
+      } catch (e) {
+        alert(e.message);
+      }
+    }, []);
+  }
+
+  const getMedia = async () => {
+    try {
+      setLoading(true);
+      const files = await doFetch(baseUrl + 'tags/' + appIdentifier);
       // console.log(files);
-
-      const media = await Promise.all(
+      let allFiles = await Promise.all(
         files.map(async (item) => {
-          const resp = await fetch(baseUrl + 'media/' + item.file_id);
-          return resp.json();
+          return await doFetch(baseUrl + 'media/' + item.file_id);
         })
       );
+      if (ownFiles) {
+        allFiles = allFiles.filter((item) => {
+          return item.user_id === user.user_id;
+        });
+      }
+      return allFiles;
+    } catch (e) {
+      throw new Error(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      setPicArray(media);
+  const postMedia = async (fd, token) => {
+    setLoading(true);
+    const fetchOptions = {
+      method: 'POST',
+      headers: {
+        'x-access-token': token,
+      },
+      body: fd,
     };
+    try {
+      return await doFetch(baseUrl + 'media', fetchOptions);
+    } catch (e) {
+      throw new Error('upload failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadMedia();
-  }, []);
-  return picArray;
+  const putMedia = async (data, id, token) => {
+    setLoading(true);
+    const fetchOptions = {
+      method: 'PUT',
+      headers: {
+        'x-access-token': token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    };
+    try {
+      return await doFetch(baseUrl + 'media/' + id, fetchOptions);
+    } catch (e) {
+      throw new Error('modify failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteMedia = async (id, token) => {
+    setLoading(true);
+    const fetchOptions = {
+      method: 'DELETE',
+      headers: {
+        'x-access-token': token,
+      },
+    };
+    try {
+      return await doFetch(baseUrl + 'media/' + id, fetchOptions);
+    } catch (e) {
+      throw new Error('delete failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {getMedia, postMedia, putMedia, deleteMedia, loading, picArray};
 };
 
 const useUsers = () => {
@@ -54,9 +130,7 @@ const useUsers = () => {
       body: JSON.stringify(inputs),
     };
     try {
-      const response = await doFetch(baseUrl + 'users', fetchOptions);
-      console.log(response);
-      return response;
+      return await doFetch(baseUrl + 'users', fetchOptions);
     } catch (e) {
       alert(e.message);
     }
@@ -79,8 +153,7 @@ const useUsers = () => {
       },
     };
     try {
-      const response = await doFetch(baseUrl + 'users/user', fetchOptions);
-      return response;
+      return await doFetch(baseUrl + 'users/user', fetchOptions);
     } catch (e) {
       throw new Error(e.message);
     }
@@ -94,8 +167,7 @@ const useUsers = () => {
       },
     };
     try {
-      const response = await doFetch(baseUrl + 'users/' + id, fetchOptions);
-      return response;
+      return await doFetch(baseUrl + 'users/' + id, fetchOptions);
     } catch (e) {
       throw new Error(e.message);
     }
@@ -114,37 +186,13 @@ const useLogin = () => {
       body: JSON.stringify(inputs),
     };
     try {
-      const response = await doFetch(baseUrl + 'login', fetchOptions);
-      return response;
+      return await doFetch(baseUrl + 'login', fetchOptions);
     } catch (e) {
       alert(e.message);
     }
   };
 
   return {postLogin};
-};
-
-const useMedia = () => {
-  const [loading, setLoading] = useState(false);
-  const postMedia = async (fd, token) => {
-    setLoading(true);
-    const fetchOptions = {
-      method: 'POST',
-      headers: {
-        'x-access-token': token,
-      },
-      body: fd,
-    };
-    try {
-      const response = await doFetch(baseUrl + 'media', fetchOptions);
-      return response;
-    } catch (e) {
-      throw new Error('Upload failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-  return {postMedia, loading};
 };
 
 const useTag = () => {
@@ -162,14 +210,13 @@ const useTag = () => {
       body: JSON.stringify(data),
     };
     try {
-      const response = await doFetch(baseUrl + 'tags', fetchOptions);
-      return response;
+      return await doFetch(baseUrl + 'tags', fetchOptions);
     } catch (e) {
-      throw new Error('Tagging failed');
+      throw new Error('tagging failed');
     }
   };
 
   return {postTag};
 };
 
-export {useAllMedia, useUsers, useLogin, useMedia, useTag};
+export {useMedia, useUsers, useLogin, useTag};

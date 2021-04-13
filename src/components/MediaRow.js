@@ -1,77 +1,109 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable indent */
 import PropTypes from 'prop-types';
 import {uploadsUrl} from '../utils/variables';
-import {Link} from 'react-router-dom';
-import {Grid, makeStyles, Paper, Typography} from '@material-ui/core';
+import {Link as RouterLink} from 'react-router-dom';
+import {GridListTileBar, IconButton, makeStyles} from '@material-ui/core';
+import PageviewIcon from '@material-ui/icons/Pageview';
+import DeleteIcon from '@material-ui/icons/Delete';
+import CreateIcon from '@material-ui/icons/Create';
+import {useMedia} from '../hooks/ApiHooks';
+import {withRouter} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    marginBottom: 20,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    margin: 'auto',
-    maxWidth: 500,
-  },
-  img: {
-    margin: 'auto',
-    display: 'block',
-    maxWidth: '100%',
-    maxHeight: '100%',
+  icon: {
+    color: 'rgba(255, 255, 255, 0.54)',
   },
 }));
 
-const MediaRow = ({file}) => {
+const MediaRow = ({file, ownFiles, history}) => {
   const classes = useStyles();
-  const desc = JSON.parse(file.description);
-  console.log('desc', desc.description);
+  const {deleteMedia} = useMedia();
+
+  let desc = {}; // jos kuva tallennettu ennen week4C, description ei ole JSONia
+  try {
+    desc = JSON.parse(file.description);
+    console.log(desc);
+  } catch (e) {
+    desc = {description: file.description};
+  }
 
   return (
-    <Grid item className={classes.root} lg="4">
-      <Paper elevation="4" className={classes.paper}>
-        <Grid container spacing={2}>
-          <Grid item>
-            <Link
+    <>
+      <img
+        src={uploadsUrl + file.thumbnails?.w320}
+        alt={file.title}
+        style={{
+          filter: `
+            brightness(${desc.filters?.brightness}%)
+            contrast(${desc.filters?.contrast}%)
+            saturate(${desc.filters?.saturate}%)
+            sepia(${desc.filters?.sepia}%)
+            `,
+        }}
+      />
+      <GridListTileBar
+        title={file.title}
+        subtitle={ownFiles || desc.description}
+        actionIcon={
+          <>
+            <IconButton
+              aria-label={`info about ${file.title}`}
+              component={RouterLink}
               to={{
                 pathname: '/single',
                 state: file,
               }}
+              className={classes.icon}
             >
-              <img
-                className={classes.img}
-                src={uploadsUrl + file.thumbnails?.w160}
-                alt={file.title}
-                style={{
-                  filter: `
-                  brightness(${desc.filters.brightness}%)
-                  contrast(${desc.filters.contrast}%)
-                  saturate(${desc.filters.saturate}%)
-                  sepia(${desc.filters.sepia}%)
-                  `,
-                }}
-              />
-            </Link>
-          </Grid>
-          <Grid item xs={12} sm container>
-            <Grid item xs container direction="column" spacing={2}>
-              <Grid item xs>
-                <Typography gutterBottom variant="subtitle1">
-                  {file.title}
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  {desc.description}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Paper>
-    </Grid>
+              <PageviewIcon fontSize="large" />
+            </IconButton>
+            {ownFiles && (
+              <>
+                <IconButton
+                  aria-label={`modify file`}
+                  className={classes.icon}
+                  component={RouterLink}
+                  to={{
+                    pathname: '/modify',
+                    state: file,
+                  }}
+                >
+                  <CreateIcon fontSize="large" />
+                </IconButton>
+                <IconButton
+                  aria-label={`delete file`}
+                  className={classes.icon}
+                  onClick={() => {
+                    try {
+                      const conf = confirm('Do you really want to delete?');
+                      if (conf) {
+                        deleteMedia(
+                          file.file_id,
+                          localStorage.getItem('token')
+                        );
+                        history.push('/profile');
+                      }
+                    } catch (e) {
+                      console.log(e.message);
+                    }
+                  }}
+                >
+                  <DeleteIcon fontSize="large" />
+                </IconButton>
+              </>
+            )}
+          </>
+        }
+      />
+    </>
   );
 };
 
 MediaRow.propTypes = {
   file: PropTypes.object,
+  ownFiles: PropTypes.bool,
+  history: PropTypes.object,
 };
 
-export default MediaRow;
+export default withRouter(MediaRow);
