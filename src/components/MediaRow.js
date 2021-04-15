@@ -7,7 +7,6 @@ import {GridListTileBar, IconButton, makeStyles} from '@material-ui/core';
 import PageviewIcon from '@material-ui/icons/Pageview';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
-import {useMedia} from '../hooks/ApiHooks';
 import {withRouter} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,9 +15,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MediaRow = ({file, ownFiles, history}) => {
+const MediaRow = ({file, ownFiles, history, deleteMedia}) => {
   const classes = useStyles();
-  const {deleteMedia} = useMedia();
 
   let desc = {}; // jos kuva tallennettu ennen week4C, description ei ole JSONia
   try {
@@ -82,7 +80,6 @@ const MediaRow = ({file, ownFiles, history}) => {
                           file.file_id,
                           localStorage.getItem('token')
                         );
-                        history.push('/profile');
                       }
                     } catch (e) {
                       console.log(e.message);
@@ -104,6 +101,7 @@ MediaRow.propTypes = {
   file: PropTypes.object,
   ownFiles: PropTypes.bool,
   history: PropTypes.object,
+  deleteMedia: PropTypes.func,
 };
 
 export default withRouter(MediaRow);

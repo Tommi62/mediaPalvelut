@@ -109,7 +109,11 @@ const useMedia = (update = false, ownFiles) => {
       },
     };
     try {
-      return await doFetch(baseUrl + 'media/' + id, fetchOptions);
+      const resp = await doFetch(baseUrl + 'media/' + id, fetchOptions);
+      if (resp) {
+        const media = await getMedia();
+        setPicArray(media);
+      }
     } catch (e) {
       throw new Error('delete failed');
     } finally {
@@ -126,6 +130,22 @@ const useUsers = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(inputs),
+    };
+    try {
+      return await doFetch(baseUrl + 'users', fetchOptions);
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const putUser = async (inputs, token) => {
+    const fetchOptions = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token,
       },
       body: JSON.stringify(inputs),
     };
@@ -173,7 +193,7 @@ const useUsers = () => {
     }
   };
 
-  return {register, getUserAvailable, getUser, getUserById};
+  return {register, getUserAvailable, getUser, getUserById, putUser};
 };
 
 const useLogin = () => {
@@ -216,7 +236,16 @@ const useTag = () => {
     }
   };
 
-  return {postTag};
+  const getTag = async (tag) => {
+    try {
+      const response = await doFetch(baseUrl + 'tags/' + tag);
+      return response;
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  return {postTag, getTag};
 };
 
 export {useMedia, useUsers, useLogin, useTag};
