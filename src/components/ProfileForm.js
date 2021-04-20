@@ -8,10 +8,10 @@ import {Grid, Typography, Button} from '@material-ui/core';
 import {ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import {useEffect} from 'react';
 import PropTypes from 'prop-types';
-import useUploadForm from '../hooks/UploadHooks';
+import useForm from '../hooks/FormHooks';
 
-const ProfileForm = ({user}) => {
-  const {putUser} = useUsers();
+const ProfileForm = ({user, setUser, setUpdate}) => {
+  const {putUser, getUser} = useUsers();
   const {postMedia} = useMedia();
   const {postTag} = useTag();
 
@@ -33,20 +33,36 @@ const ProfileForm = ({user}) => {
   const doRegister = async () => {
     try {
       console.log('user muokkaus lomake lähtee');
+      if (inputs.file) {
+        const fd = new FormData();
+        fd.append('title', inputs.username);
+        fd.append('file', inputs.file);
+        const fileResult = await postMedia(fd, localStorage.getItem('token'));
+        const tagResult = await postTag(
+          localStorage.getItem('token'),
+          fileResult.file_id,
+          'avatar_' + user.user_id
+        );
+        console.log(fileResult, tagResult);
+        if (fileResult) {
+          alert(tagResult.message);
+          setUpdate(true);
+        }
+      }
       delete inputs.confirm;
+      delete inputs.file;
       const result = await putUser(inputs, localStorage.getItem('token'));
-      const fd = new FormData();
-      fd.append('title', inputs.username);
-      fd.append('file', inputs.file);
-      const fileResult = await postMedia(fd, localStorage.getItem('token'));
-      const tagResult = await postTag(
-        localStorage.getItem('token'),
-        fileResult.file_id,
-        'avatar_' + user.user_id
-      );
-      console.log('doUpload', fileResult, tagResult);
-      if (result && fileResult && tagResult) {
+      console.log('doUpload', result);
+      if (result) {
         alert(result.message);
+        const userData = await getUser(localStorage.getItem('token'));
+        setUser(userData);
+        // reset form (password and confirm)
+        setInputs((inputs) => ({
+          ...inputs,
+          password: '',
+          confirm: '',
+        }));
       }
     } catch (e) {
       console.log(e.message);
@@ -55,10 +71,11 @@ const ProfileForm = ({user}) => {
 
   const {
     inputs,
+    setInputs,
     handleInputChange,
     handleSubmit,
     handleFileChange,
-  } = useUploadForm(doRegister, user);
+  } = useForm(doRegister, user);
 
   useEffect(() => {
     ValidatorForm.addValidationRule(
@@ -72,38 +89,40 @@ const ProfileForm = ({user}) => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <Typography component="h1" variant="h2" gutterBottom>
-          Modify user
+        <Typography component="h1" variant="h4" gutterBottom>
+          Update profile
         </Typography>
       </Grid>
       <Grid item xs={12}>
         <ValidatorForm onSubmit={handleSubmit}>
           <Grid container>
-            <Grid container item>
+            <Grid item xs={12}>
               <TextValidator
                 fullWidth
                 type="password"
                 name="password"
                 label="Password"
+                value={inputs?.password}
                 onChange={handleInputChange}
                 validators={validators.password}
                 errorMessages={errorMessages.password}
               />
             </Grid>
 
-            <Grid container item>
+            <Grid item xs={12}>
               <TextValidator
                 fullWidth
                 type="password"
                 name="confirm"
                 label="Confirm password"
+                value={inputs?.confirm}
                 onChange={handleInputChange}
                 validators={validators.confirm}
                 errorMessages={errorMessages.confirm}
               />
             </Grid>
 
-            <Grid container item>
+            <Grid item xs={12}>
               <TextValidator
                 fullWidth
                 type="email"
@@ -116,7 +135,7 @@ const ProfileForm = ({user}) => {
               />
             </Grid>
 
-            <Grid container item>
+            <Grid item xs={12}>
               <TextValidator
                 fullWidth
                 type="text"
@@ -134,19 +153,19 @@ const ProfileForm = ({user}) => {
                 fullWidth
                 type="file"
                 name="file"
-                accept="image/*, audio/*, video/*"
+                accept="image/*"
                 onChange={handleFileChange}
               />
             </Grid>
 
-            <Grid container item>
+            <Grid item xs={12}>
               <Button
                 fullWidth
                 color="primary"
                 type="submit"
                 variant="contained"
               >
-                Register
+                Update
               </Button>
             </Grid>
           </Grid>
@@ -158,6 +177,8 @@ const ProfileForm = ({user}) => {
 
 ProfileForm.propTypes = {
   user: PropTypes.object,
+  setUser: PropTypes.func,
+  setUpdate: PropTypes.func,
 };
 
 export default ProfileForm;

@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable comma-dangle */
 /* eslint-disable indent */
-import useUploadForm from '../hooks/UploadHooks';
+import useForm from '../hooks/FormHooks';
 import {useMedia} from '../hooks/ApiHooks';
 import {
   CircularProgress,
@@ -9,21 +9,13 @@ import {
   Grid,
   Typography,
   Slider,
-  makeStyles,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import {ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import useSlider from '../hooks/SliderHooks';
 import {uploadsUrl} from '../utils/variables';
 
-const useStyles = makeStyles({
-  root: {
-    marginTop: '2rem',
-  },
-});
-
 const Modify = ({history, location}) => {
-  const classes = useStyles();
   const {putMedia, loading} = useMedia();
   const file = location.state;
 
@@ -61,7 +53,7 @@ const Modify = ({history, location}) => {
     }
   };
 
-  const {inputs, handleInputChange, handleSubmit} = useUploadForm(doUpload, {
+  const {inputs, handleInputChange, handleSubmit} = useForm(doUpload, {
     title: file.title,
     description: desc.description,
   });
@@ -74,7 +66,7 @@ const Modify = ({history, location}) => {
     <>
       <Grid container>
         <Grid item xs={12}>
-          <Typography component="h1" variant="h2" gutterBottom align="center">
+          <Typography component="h1" variant="h2" gutterBottom>
             Modify
           </Typography>
         </Grid>
@@ -122,7 +114,7 @@ const Modify = ({history, location}) => {
                 alignItems="center"
                 justify="center"
               >
-                <Grid item xs={6} className={classes.root}>
+                <Grid item xs={6}>
                   <img
                     src={uploadsUrl + file.filename}
                     style={{
@@ -136,7 +128,7 @@ const Modify = ({history, location}) => {
                     }}
                   />
                 </Grid>
-                <Grid container className={classes.root}>
+                <Grid container>
                   <Grid item xs={12}>
                     <Typography>Brightness</Typography>
                     <Slider

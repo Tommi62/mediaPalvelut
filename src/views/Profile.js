@@ -1,27 +1,30 @@
 import {useContext, useEffect, useState} from 'react';
 import {MediaContext} from '../contexts/MediaContext';
 import {
+  Avatar,
   Card,
   CardContent,
-  CardMedia,
   Grid,
   List,
   ListItem,
+  ListItemAvatar,
   ListItemIcon,
   ListItemText,
   Typography,
 } from '@material-ui/core';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import PersonIcon from '@material-ui/icons/Person';
 import EmailIcon from '@material-ui/icons/Email';
 import {Link as RouterLink} from 'react-router-dom';
 import ProfileForm from '../components/ProfileForm';
 import {useTag} from '../hooks/ApiHooks';
 import {uploadsUrl} from '../utils/variables';
+import CreateIcon from '@material-ui/icons/Create';
 
 const Profile = () => {
-  const [user] = useContext(MediaContext);
+  const [user, setUser] = useContext(MediaContext);
   const [avatar, setAvatar] = useState('logo512.png');
+  const [update, setUpdate] = useState(false);
+  const [toggleForm, setToggleForm] = useState(false);
   const {getTag} = useTag();
 
   useEffect(() => {
@@ -36,7 +39,7 @@ const Profile = () => {
         console.log(e.message);
       }
     })();
-  }, [user]);
+  }, [user, update]);
 
   console.log(avatar);
 
@@ -47,13 +50,12 @@ const Profile = () => {
       </Typography>
       {user && (
         <Card>
-          <CardMedia image={avatar} style={{height: '20vh'}} />
           <CardContent>
             <List>
               <ListItem>
-                <ListItemIcon>
-                  <AccountBoxIcon />
-                </ListItemIcon>
+                <ListItemAvatar>
+                  <Avatar variant={'square'} src={avatar} />
+                </ListItemAvatar>
                 <ListItemText primary={user.username} />
               </ListItem>
               <ListItem>
@@ -74,13 +76,30 @@ const Profile = () => {
                 </ListItemIcon>
                 <ListItemText primary="My files" />
               </ListItem>
+              <ListItem
+                button
+                onClick={() => {
+                  setToggleForm(!toggleForm);
+                }}
+              >
+                <ListItemIcon>
+                  <CreateIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    toggleForm ? 'Close update profile' : 'Update profile'
+                  }
+                />
+              </ListItem>
             </List>
           </CardContent>
         </Card>
       )}
-      <Grid>
-        <ProfileForm user={user} />
-      </Grid>
+      {toggleForm && (
+        <Grid>
+          <ProfileForm user={user} setUser={setUser} setUpdate={setUpdate} />
+        </Grid>
+      )}
     </>
   );
 };
